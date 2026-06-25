@@ -1,0 +1,49 @@
+alarm_thresholds:
+  abnormal_behavior: 0.7
+  fall_detection: 0.75
+  smoke_detection: 0.3
+  fire_detection: 0.5
+  face_recognition: 0.42  # 分级: confirmed>0.50, possible>0.42
+alarm_cooldown:
+  fall: 300
+  smoke: 300
+  fire: 300
+  stranger: 300
+  wander: 600
+  linger: 600
+  violent: 600
+  motionless: 600
+cameras:
+- fps: 15
+  id: camera_1
+  name: 主厅摄像头
+  resolution:
+    height: 720
+    width: 1280
+  source: 0
+  type: highres_rgb
+model_paths:
+  behavior: ./models/behavior_model/
+  fall_detection: ./models/fall_detection/
+  yolo_face_smoke: ./models/yolo_face_smoke/
+  yolo_pose: ./models/yolo_pose/
+  face_db: ./data/face_db/
+processing:
+  frame_interval: 1
+  input_size:
+    height: 480
+    width: 640
+  num_threads: 4
+  queue_size: 100
+  yolo_face_skip_frames: 3
+  yolo_device: 0
+storage:
+  alarms: ./data/alarms/
+  logs: ./data/logs/
+  screenshots: ./data/alarms/screenshots/
+  videos: ./data/alarms/videos/
+system:
+  alarm_sound: ./data/alarm.wav
+  auto_save_interval: 300
+  enable_audio_alarm: true
+  max_alarm_history: 100

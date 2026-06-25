@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(echo 'PROJECT_ROOT=D:\\\\Trae文件\\\\银发守护者系统')",
+      "Bash(test -d 'D:\\\\Trae文件\\\\银发守护者系统')",
+      "Bash(echo \"Directory exists\")",
+      "Bash(echo \"Directory does NOT exist\")",
+      "Read(//c/Users/Lenovo/.insightface/models/**)",
+      "Bash(curl -L -o buffalo_l.zip \"https://hub.nuaa.cf/deepinsight/insightface/releases/download/v0.7/buffalo_l.zip\" --connect-timeout 10 --max-time 300)",
+      "Bash(curl -L -o buffalo_l.zip \"https://ghproxy.com/https://github.com/deepinsight/insightface/releases/download/v0.7/buffalo_l.zip\" --connect-timeout 10 --max-time 600)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); [print\\(f'  {k}: {len\\(v\\)} vectors'\\) for k,v in d.items\\(\\)]\")",
+      "Bash(python scripts/training/train_yolo_smoke.py --fast)",
+      "Bash(python *)"
+    ]
+  }
+}

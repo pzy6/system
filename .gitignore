@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+*.pyo
+data/logs/
+data/alarms/
+*.log
+*.jsonl
+.env
+.vscode/
+.idea/
+*.pkl
+*.pickle
+models/*.pt
+models/*.onnx
+models/*.pth

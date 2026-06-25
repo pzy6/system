@@ -1,0 +1,70 @@
+银发守护者系统 - 配置说明
+================================
+
+配置文件位置：config/config.yaml
+
+一、摄像头配置
+
+1. USB 摄像头
+   source: 0, 1, 2... (设备编号)
+
+2. RTSP 网络摄像头
+   source: rtsp://username:password@ip:port/path
+
+3. 分辨率和帧率
+   resolution:
+     width: 1920
+     height: 1080
+   fps: 30
+
+二、告警阈值
+
+1. 跌倒检测
+   fall_detection: 0.75 (置信度阈值 0-1)
+
+2. 心率
+   heart_rate:
+     min: 60
+     max: 100
+
+3. 呼吸率
+   respiratory_rate:
+     min: 12
+     max: 20
+
+三、处理参数
+
+1. 输入尺寸
+   input_size:
+     width: 640
+     height: 480
+
+2. 线程数
+   num_threads: 4 (推荐为 CPU 核心数)
+
+3. 队列长度
+   queue_size: 100
+
+四、存储路径
+
+1. 日志文件
+   logs: ./data/logs/
+
+2. 告警截图
+   screenshots: ./data/alarms/screenshots/
+
+3. 告警视频
+   videos: ./data/alarms/videos/
+
+五、系统设置
+
+1. 声音告警
+   enable_audio_alarm: true
+
+2. 告警声音
+   alarm_sound: ./data/alarm.wav
+
+3. 最大历史记录
+   max_alarm_history: 100
+
+注意：修改配置后需要重启程序才能生效。

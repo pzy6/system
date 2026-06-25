@@ -1,0 +1,7 @@
+path: D:/Trae文件/银发守护者系统/data/HomefireDataset
+train: train/images
+val: val/images
+names:
+  0: fire
+  1: smoke
+nc: 2
