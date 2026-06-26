@@ -70,6 +70,7 @@ from application.dashboard import Dashboard, DashboardUpdater, AlarmEvent
 from application.modern_dashboard import ModernDashboard
 from application.splash_screen import SplashScreen
 from utils.audio import play_smoke_beep, play_fall_voice
+from utils.common import put_latest
 
 logger = logging.getLogger(__name__)
 
@@ -288,9 +289,10 @@ class SilverGuardianSystem:
         self.alarm_video_buffer = None
         self.model_status = {}
         
-        self.raw_frame_queue = Queue(maxsize=100)
-        self.processed_frame_queue = Queue(maxsize=100)
-        self.dashboard_frame_queue = Queue(maxsize=50)
+        live_queue_size = max(len(self.config.get('cameras', [])) * 2, 4)
+        self.raw_frame_queue = Queue(maxsize=live_queue_size)
+        self.processed_frame_queue = Queue(maxsize=live_queue_size)
+        self.dashboard_frame_queue = Queue(maxsize=8)
         self.alarm_queue = Queue(maxsize=50)
         self.face_identity_queue = Queue(maxsize=50)
         
@@ -578,6 +580,7 @@ class SilverGuardianSystem:
             frame = frame_item.get('original_frame', frame_item['frame'])
             processed_frame = frame_item.get('processed_frame', frame_item['frame'])
             timestamp = frame_item['timestamp']
+            self._enqueue_dashboard_frame(camera_id, camera_name, frame, timestamp)
             self.alarm_video_buffer.add_frame(
                 camera_id,
                 frame,
@@ -776,18 +779,14 @@ class SilverGuardianSystem:
                 display_frame = frame
             self._t_draw += time.perf_counter() - _td
 
-            # 非阻塞: UI 跟不上时丢帧, 不阻塞处理流水线
-            try:
-                self.dashboard_frame_queue.put({
-                    'camera_id': camera_id,
-                    'camera_name': camera_name,
-                    'frame': display_frame,
-                    'skeletons': skeletons,
-                    'fall_detected': fall_detected,
-                    'timestamp': timestamp
-                }, block=False)
-            except Exception:
-                pass
+            self._enqueue_dashboard_frame(
+                camera_id,
+                camera_name,
+                display_frame,
+                timestamp,
+                skeletons=skeletons,
+                fall_detected=fall_detected,
+            )
 
             self.frame_count += 1
             current_time = time.time()
@@ -810,6 +809,17 @@ class SilverGuardianSystem:
         except Exception as e:
             import traceback as _tb
             logger.error(f"Frame processing error: {e}\n{_tb.format_exc()}")
+
+    def _enqueue_dashboard_frame(self, camera_id, camera_name, frame, timestamp,
+                                 skeletons=None, fall_detected=False):
+        put_latest(self.dashboard_frame_queue, {
+            'camera_id': camera_id,
+            'camera_name': camera_name,
+            'frame': frame,
+            'skeletons': skeletons or [],
+            'fall_detected': fall_detected,
+            'timestamp': timestamp
+        })
 
     def _emit_alarm(self, alarm):
         # 录制和截图放到后台线程，避免阻塞 process_frame

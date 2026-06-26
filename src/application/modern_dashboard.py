@@ -2,6 +2,7 @@ import sys
 import os
 import cv2
 import numpy as np
+from queue import Empty
 from datetime import datetime
 from PyQt5.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
@@ -694,14 +695,19 @@ class ModernDashboard(QMainWindow):
         if not self._camera_id_map:
             for i, cam in enumerate(self.config.get('cameras', [])):
                 self._camera_id_map[cam['id']] = i
-        try:
-            while not q.empty():
+        latest_frames = {}
+        while True:
+            try:
                 item = q.get_nowait()
-                cam_id = item['camera_id']
-                idx = self._camera_id_map.get(cam_id, 0)
-                self.on_frame_ready(idx, item['frame'])
-        except Exception:
-            pass
+            except Empty:
+                break
+            except Exception:
+                return
+            cam_id = item['camera_id']
+            idx = self._camera_id_map.get(cam_id, 0)
+            latest_frames[idx] = item['frame']
+        for idx, frame in latest_frames.items():
+            self.on_frame_ready(idx, frame)
 
     def on_frame_ready(self, index, frame):
         if index not in self.camera_frames:

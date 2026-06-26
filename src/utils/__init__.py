@@ -1,5 +1,6 @@
 from .common import (
     ensure_directory,
+    put_latest,
     timestamp_to_datetime,
     save_json,
     load_json,
@@ -9,6 +10,7 @@ from .common import (
 
 __all__ = [
     'ensure_directory',
+    'put_latest',
     'timestamp_to_datetime',
     'save_json',
     'load_json',

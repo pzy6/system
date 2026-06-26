@@ -5,6 +5,7 @@ import time
 import logging
 import os
 from typing import Optional, Tuple, Any
+from utils.common import put_latest
 
 # 抑制 OpenCV 摄像头探测时的 WARN/ERROR 刷屏
 os.environ['OPENCV_LOG_LEVEL'] = 'FATAL'
@@ -152,18 +153,20 @@ class CameraWorker:
                     self.frame_count += 1
                     
                     if self.frame_queue is not None:
-                        try:
-                            self.frame_queue.put({
-                                'camera_id': self.camera_id,
-                                'camera_name': self.camera_name,
-                                'frame': frame,
-                                'timestamp': timestamp,
-                                'frame_count': self.frame_count
-                            }, block=False)
-                        except Exception:
-                            self.drop_count += 1
-                            if self.drop_count % 100 == 0:
-                                logger.warning(f"Frame queue full for camera {self.camera_id}, dropped {self.drop_count} frames")
+                        item = {
+                            'camera_id': self.camera_id,
+                            'camera_name': self.camera_name,
+                            'frame': frame,
+                            'timestamp': timestamp,
+                            'frame_count': self.frame_count
+                        }
+                        dropped = put_latest(self.frame_queue, item)
+                        if dropped:
+                            self.drop_count += dropped
+                            logger.warning(
+                                f"Frame queue full for camera {self.camera_id}, "
+                                f"dropped {dropped} stale frames"
+                            )
                 else:
                     time.sleep(0.01)
             else:

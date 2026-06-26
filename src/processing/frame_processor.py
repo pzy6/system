@@ -5,6 +5,7 @@ import time
 import logging
 from queue import Queue
 from typing import Optional, Dict, Any
+from utils.common import put_latest
 
 logger = logging.getLogger(__name__)
 
@@ -57,7 +58,7 @@ class FrameProcessor:
                     'frame_count': frame_count
                 }
                 
-                self.output_queue.put(output_item)
+                put_latest(self.output_queue, output_item)
                 self.processed_count += 1
                 
                 if self.processed_count % 1000 == 0:
